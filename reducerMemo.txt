@@ -1,0 +1,100 @@
+■ reducer를 이용한 상태 관리 순서 정리
+1. dispatch(액션타입, 액션 페이로드)로 
+    액션 타입(필수)과 액션 페이로드(추가적인 데이터, 선택적)를 리듀서에 전달 
+
+2. reducer는 dispatch에서 보낸 액션 타입으로 어떤 상태 처리를 할지 분기 
+    & 상태의 초기값 생성 혹은 dispatch에서 전달한 값을 매개로 새 값을 생성 
+
+3. reducer에서 생성한 값을 상태에 반영
+
+* 액션 타입 : (필수) 리듀서가 어떤 행동을 할지 선택하는 값
+* 액션 페이로드 : (선택적) 리듀서가 액션을 수행하는데 필요로 하는 추가 데이터
+
+
+■ reducer의 종류
+useReducer : 로컬 상태 관리 => 컴포넌트 내부의 상태를 관리하는데 적합
+useDispatch : 전역 상태 관리 => 앱 수준의 상태 관리에 적합
+combineReducers : 여러 리듀서를 하나의 리듀서로 병합
+
+
+■ store 객체 사용 유의사항
+useDispatch로 상태를 전역 상태로서 관리하기 위해선 react-redux 패키지에서 
+제공하는 프로바이더의 store 속성에 store 객체 설정 필요
+
+* (예시)
+import { Provider as ReduxProvider } from "react-redux";
+
+<ReduxProvider store={/*store 객체*/}></ReduxProvider>
+
+
+* store 객체는 특성상 앱 사용중 변경될 일이 없으며 랜더링 마다 새로 생성하는건 랜더링 성능의 낭비이므로
+한번 생성된 store 객체를 계속 재사용하기 위해 useMemo()를 통해 store 객체를 생성하여 반환하는게 권장된다.
+
+* useMemo()는 의존성 배열의 값에 변화가 없으면 이전에 저장한 값을 반환한다.
+* useMemo 예시 
+useMemo(
+    ()=>{} // 생성함수, 
+    [] //의존성 배열
+)
+
+
+■ 리듀서 함수의 기본 형태
+
+const initialAppState = { // 상태의 초기값
+  today: new Date(),
+};
+
+export const rootReducer = (
+  //리듀서는 현재 상태와 액션 객체를 매개변수로 새로운 상태를 반환한다.
+  state: AppState = initialAppState, //상태의 초기값
+  action: Actions //액션개체
+) => {
+  switch (action.type) {
+    case "setToday": {
+      console.log("action type is ", action.type);
+      return { ...state, today: action.today };
+    }
+  }
+  return state;
+};
+
+
+■ combineReducers 사용시 액션타입명 정의 유의사항
+여러가지의 리듀서를 복합적으로 처리하는 combineReducers인 만큼 액션타입의 충돌(이름이 겹침)을 
+방지하기 위해 "@네임스페이스/액션타입" 구조로 정의할 것
+
+■ combineReducers 사용시 rootReducer 설정과 AppState 타입 정의 유의사항
+reducer들을 모아 combineReducers() 함수로 생성하는 rootReducer 와 AppState(앱 전역 상태)의 타입 정의시 
+각 속성의 이름을 동일하게 설정하지 않으면 상태를 불러올 수 없다
+
+■ 리듀서는 순수 함수로 만들것
+리듀서는 리덕스 저장소에 저장된 과거 상태와 현재 상태를 (과거상태 !== 현재상태) 형태로 비교한다.
+따라서 리듀서에서 현재 상태 값을 생성하려면 과거 상태값과 독립된 새로운 값을 만들어야 하며 
+과거 상태값을 직접 변경하면 안된다.
+
+■ 순수함수
+* 외부값을 변경하지 않고 내부에서 새로운 값을 생성할것 
+* 만들어진 값을 즉시 반환할것
+* 함수 내부에서 전역 변수나 정적 변수를 사용하지 않을것
+* callback 함수 형태로 만들지 말것
+* 함수 내부에서 callback 함수를 사용하는 코드는 사용하지 않을것 
+* 예외를 발생시키지 않을것
+* 함수 내부에서 Promise와 같은 비동기 방식으로 동작하는 코드를 사용하지 않을것
+* 위 조건을 충족하지 못하는 함수는 불순함수라고 한다.
+
+■ callback 함수
+함수에서 매개변수로 함수를 전달받아 사용하는 함수 형태
+
+■ reudx-thunk 미들웨어
+dispatch에서 객체가 아닌 함수 형태의 action을 보낸다
+* 일반적인 액션 흐름과의 차이는 dispatch를 통해 reducer로 action을 보내기전 
+action 함수에서 비동기 로직을 처리한 후 다음 미들웨어나 리듀서로 action을 보낸다는 점이다. 
+
+■ useSelector<> 훅
+리덕스 저장소에 저장된 상태를 호출하여 값의 일련의 가공을 한 후 반환하는 훅.
+
+useSelector<인수1, 인수2>(({인수3}) => {})
+
+- 인수1 : 사용할 리덕스 상태의 전체 타입 (예: `AppState`)
+- 인수2 : 훅이 반환할 값의 타입 (예: `List[]`)
+- 인수3 : 리덕스 저장소에서 호출하는 상태** (콜백 함수의 인자, 예: `({ listidOrders, listEntities })`)

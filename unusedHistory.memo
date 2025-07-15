@@ -1,0 +1,170 @@
+//MenuManage
+import React, { useEffect, useMemo, useState, useCallback } from "react";
+import { AdminProvider } from "../../context/AdminContext";
+import { Link } from "react-router-dom";
+import Header from "./Header";
+import Footer from "./Footer";
+import { AdminMain } from "./AdminMain";
+import { RoundedBox } from "../../components";
+import { SideBar } from "../../components";
+import { useAuth } from "../../context/AdminContext";
+import { TopMenuBar } from "../../components";
+import { MenuAddBlock } from "../../components";
+
+export type menuCategory = {
+  cateId: string;
+  cateName: string;
+  cateQuanti: number;
+};
+
+export default function MenuManage() {
+  const { loginState, operatingHours, getOperatingHours } = useAuth();
+  const menuNames = ["메뉴관리", "옵션관리"];
+  const menuLinks = ["/amin/menumanage", "/admin/optionmanage"];
+  const currentMenu = "메뉴관리";
+  
+  const initialCategory: menuCategory = {
+    cateId: "",
+    cateName: "",
+    cateQuanti: 0,
+  };
+
+  const [menuCategorys, setMenuCategorys] = useState<menuCategory[]>([]);
+  const [addButtonActive, setAddbuttonActive] = useState<boolean>(false);
+  const [cateName, setMenuCateName] = useState<string>("");
+
+  const activeAddCategoryButton = () => {
+    setAddbuttonActive(!addButtonActive);
+  };
+
+  const cofirmAddCategory = useCallback(() => {
+    setMenuCateName((prevCateName) => {
+      if (prevCateName.trim() && prevCateName.trim().length >= 5) {
+        const newCategory = { ...initialCategory, cateName: prevCateName };
+        setMenuCategorys([...menuCategorys, newCategory]);
+      } else {
+        alert("공백은 입력할 수 없으며 최소 5글자 이상 입력해야합니다.");
+      }
+      return prevCateName;
+    });
+  }, [cateName, menuCategorys]);
+
+  const children = useMemo(() => {
+    return (
+      <>
+        {addButtonActive && (
+          <li key="addButton">
+            <MenuAddBlock
+              setCategoryName={setMenuCateName}
+              setCategoryState={cofirmAddCategory}
+              cancelFunction={activeAddCategoryButton}
+            />
+          </li>
+        )}
+        {menuCategorys.map((category) => {
+          return (
+            <li
+              key={category.cateName}
+              className="font-bold m-3 p-5 w-[276px] h-[178px] rounded-xl bg-white shadow-[0_0px_15px_rgba(0,0,0,0.1)]"
+            >
+              <p className="text-[20px]">{category.cateName}</p>
+              <p className="text-[14px]">등록메뉴 {category.cateQuanti}개</p>
+              <p className="text-[14px] text-[#ce1224]">
+                <button type="button">카테고리 수정</button>
+              </p>
+            </li>
+          );
+        })}
+
+        <li>
+          <button
+            onClick={activeAddCategoryButton}
+            disabled={addButtonActive}
+            className={`m-3 p-5 w-[276px] h-[178px] rounded-xl bg-[#ce1224]  shadow-[0_0px_15px_rgba(0,0,0,0.1)] font-bold cursor-pointer
+            ${
+              addButtonActive
+                ? "bg-[#9e3f51] text-gray-300"
+                : "bg-[#ce1224] text-white"
+            }`}
+          >
+            <span className="block text-left text-[20px]">카테고리 추가</span>
+            <span className="block w-full text-[100px] text-right material-icons leading-[100px]">
+              add
+            </span>
+          </button>
+        </li>
+      </>
+    );
+  }, [addButtonActive, menuCategorys]);
+
+  return (
+    <>
+      <Header />
+      <AdminMain>
+        <SideBar />
+        <TopMenuBar
+          menuNames={menuNames}
+          menuLinks={menuLinks}
+          currentMenu={currentMenu}
+        />
+        <RoundedBox underLine={false}>
+          <ul className="mt-[20px] mb-[50px] flex flex-wrap">{children}</ul>
+        </RoundedBox>
+      </AdminMain>
+    </>
+  );
+}
+
+
+//MenuAddBlock
+import { FC, useEffect, useState, useCallback, ChangeEvent } from "react";
+import { PropsWithChildren } from "react";
+import type { menuCategory } from "../pages/admin/MenuManage";
+
+export type MenuAddBlockProps = {
+  setCategoryName: (cateName: string) => void;
+  setCategoryState: () => void;
+  cancelFunction?: () => void;
+};
+
+export const MenuAddBlock: FC<PropsWithChildren<MenuAddBlockProps>> = ({
+  setCategoryName,
+  setCategoryState,
+  cancelFunction,
+}) => {
+  const changeForm = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      setCategoryName(e.target.value);
+    },
+    [setCategoryName]
+  );
+
+  return (
+    <div className="m-3 p-5 w-[276px] h-[178px] rounded-xl bg-white shadow-[0_0px_15px_rgba(0,0,0,0.1)]">
+      <input
+        className="w-full p-1 m-1 border-2 rounded-md outline-none"
+        type="text"
+        name="cateName"
+        maxLength={10}
+        onChange={changeForm}
+        placeholder="카테고리명"
+      />
+      <p className="flex justify-end p-1 mt-3">
+        <button
+          className="inline-block p-2 m-1 bg-[#ce1224] text-white rounded-md"
+          type="button"
+          onClick={setCategoryState}
+        >
+          등록
+        </button>
+        <button
+          className="inline-block p-2 m-1 bg-[#ba8618] text-white rounded-md"
+          type="button"
+          onClick={cancelFunction ? () => cancelFunction() : undefined}
+        >
+          취소
+        </button>
+      </p>
+    </div>
+  );
+};
