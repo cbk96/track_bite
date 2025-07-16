@@ -162,9 +162,11 @@ export const SignUP = () => {
 
   //아이디 중복 검사의 서버 처리 결과별 메세지 처리
   useEffect(() => {
-    if (!idAvailData) return;
-    const idChkData = idAvailData;
-    if (idChkData) {
+    if (!idAvailData) {
+      return;
+    }
+
+    if (idAvailData.ok) {
       setIdChk(true);
       setIdChkMsg("사용 가능한 아이디입니다.");
     } else {

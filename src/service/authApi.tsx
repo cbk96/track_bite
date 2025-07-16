@@ -7,6 +7,7 @@ import * as CUST from "../store/customer";
 import * as CT from "../constants";
 import * as T from "../type";
 import type { Customer, LoginCustomer, Store, LoginAdmin } from "../type";
+import { useState } from "react";
 
 type Callback = () => void;
 
@@ -17,7 +18,6 @@ export const AuthApi = () => {
 
   //일반 사용자용
   const useCheckIdAvailability = () => {
-    let idAvailable = false;
     const { data, mutate, isPending, error } = useMutation<
       { ok: boolean },
       Error,
@@ -33,7 +33,7 @@ export const AuthApi = () => {
       },
     });
     return {
-      idAvailData: data ? data.ok : false,
+      idAvailData: data,
       mutateChkIdAvail: mutate,
       isChkIdAvailPending: isPending,
     };
