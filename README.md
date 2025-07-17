@@ -26,6 +26,18 @@ React, TypeScript, Express, MongoDB, Supabase를 활용하여 구현한 배달 �
 - 특히, 이전 직장에서 여러 배달 플랫폼의 관리자 사이트를 실무적으로 다뤘던 경험이 있어, 그 과정에서 쌓인 기능적 이해도를 바탕으로 **배달 플랫폼**을 주제로 선택하게 되었습니다.
   <br><br>
 
+## 🛠 사용 기술 스택
+
+| 구분          | 기술                                          |
+| ------------- | --------------------------------------------- |
+| Frontend      | React, Tanstack Query, TypeScript, Tailwind CSS, React Router |
+| Backend       | Express.js, MongoDB (Mongoose)                |
+| 인증          | JWT + Cookie                                  |
+| 이미지 저장소 | Supabase Storage                              |
+
+<br><br>
+
+
 ## ✅ 주요 기능
 
 ### 👤 고객 페이지
@@ -95,17 +107,6 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 
 유틸리티 클래스 기반의 Tailwind CSS를 사용해 반응형 UI를 구현했습니다.  
 다양한 화면 크기에 대응하며 빠르고 효율적인 스타일링을 지원합니다.
-<br><br>
-
-## 🛠 사용 기술 스택
-
-| 구분          | 기술                                          |
-| ------------- | --------------------------------------------- |
-| Frontend      | React, TypeScript, Tailwind CSS, React Router |
-| Backend       | Express.js, MongoDB (Mongoose)                |
-| 인증          | JWT + Cookie                                  |
-| 이미지 저장소 | Supabase Storage                              |
-
 <br><br>
 
 ## 🛠️ 일부 기능 미리보기
