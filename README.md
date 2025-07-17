@@ -94,14 +94,9 @@ React, TypeScript, Express, MongoDB, Supabase를 활용하여 구현한 배달 �
 JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.  
 토큰 만료 시 자동 갱신 기능을 구현해 원활한 사용자 경험을 제공합니다.
 
-### 🍃 MongoDB (Mongoose)
+### 🍃 MongoDB
 
 프로젝트 전반의 데이터를 MongoDB로 관리하며, 메뉴와 옵션은 물론 주문, 사용자, 쿠폰 등 다양한 정보를 유연하고 확장성 있게 처리했습니다.
-
-### ☁️ Supabase Storage
-
-안정적인 클라우드 저장소인 Supabase Storage를 활용해 이미지 업로드와 관리를 담당했습니다.  
-서버 부하를 줄이고 빠른 이미지 제공을 가능하게 했습니다.
 
 ### 🎨 Tailwind CSS
 
