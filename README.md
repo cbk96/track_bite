@@ -30,10 +30,11 @@ React, TypeScript, Express, MongoDB, Supabase를 활용하여 구현한 배달 �
 
 | 구분          | 기술                                          |
 | ------------- | --------------------------------------------- |
-| Frontend      | React, Tanstack Query, TypeScript, Tailwind CSS, React Router |
-| Backend       | Express.js, MongoDB                |
-| 인증          | JWT + Cookie                                  |
-| 이미지 저장소 | Supabase Storage                              |
+| Frontend | React, Tanstack Query, TypeScript, Tailwind CSS, React Router |
+| Backend | Express.js, MongoDB |
+| 인증 | JWT + Cookie |
+| 배포 | Vercel(Frontend), Render(Backend), MongoDB Atlas
+| 이미지 저장소 | Supabase Storage |
 
 <br><br>
 
