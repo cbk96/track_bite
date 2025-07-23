@@ -271,6 +271,52 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 
 <br><br>
 
+## 🏷️ 주문서 작성시 쿠폰은 이렇게 사용됩니다.
+
+- 스토어 관리자가 업로드한 쿠폰은, 고객이 다운로드한 이후에도 사용 가능 여부를 수정할 수 있어야 한다고 판단했습니다.
+- 이에 따라 MongoDB에서는 쿠폰 정보를 Coupons 컬렉션(스토어 관리자 전용)과 CouponIssues 컬렉션(고객이 보유한 쿠폰)으로 분리하여 저장하도록 설계했습니다.
+
+### 1. 주문서에서 사용할 쿠폰 상태 및 API 초기화
+
+``` ts
+
+import {CouponApi} from "../service";
+
+//주문시 고객이 사용하고자 선택한 쿠폰의 아이디 목록
+const [selectCoupon, setSelectCoupon] = useState<string[]>([]);
+
+//고객이 보유중인 쿠폰중 주문에서 사용 가능한 쿠폰 목록
+const [canUseCoupon, setCanUseCoupon] = useState<CouponIssue[]>([]);
+
+//스토어 관리자가 사용 가능 상태로 설정한 쿠폰의 아이디 목록
+  const [canUseCouponIds, setCanUseCouponIds] = useState<string[]>([]);
+
+//쿠폰으로 할인되는 할인액의 총합
+  const [totalCouponDiscountPrice, setTotalCouponDiscountPrice] =
+    useState<number>(0);
+
+//DB에 저장된 쿠폰 정보 호출 API
+const { useGetCouponIssues, useUpdateCouponIssues, useGetCouponsPublic } =
+    CouponApi();
+
+//고객이 보유중인 쿠폰 호출 (type : Coupon)
+ const CouponIssueData = useGetCouponIssues(
+    storePublicId ? storePublicId : "",
+    loginStatus.customerId,
+    loginStatus.logined === "login"
+  ).couponIssueGetData;
+
+//스토어 관리자가 설정중인 쿠폰 사용 가능 여부를 확인하기 위해 가게의 쿠폰 데이터 조회 (type : Coupon)
+  const { getSearchingCouponPBData } = useGetCouponsPublic({
+    isUsable: true,
+    isVisible: true,
+    storePublicId: storePublicId ?? "",
+    today: new Date(),
+  });
+
+
+```
+
 <br><br>
 
 ## 🔐 클라이언트와 서버 통신 시 고려한 사항
