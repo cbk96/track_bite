@@ -273,7 +273,7 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 
 ## 🏷️ 주문서 작성시 쿠폰은 이렇게 사용됩니다.
 
-- 스토어 관리자가 업로드한 쿠폰은, 고객이 다운로드한 이후에도 사용 가능 여부를 수정할 수 있어야 한다고 판단했습니다.
+- 스토어 관리자가 업로드한 쿠폰은 고객이 다운로드한 이후에도 사용 가능 여부를 수정할 수 있어야 한다고 판단했습니다.
 - 이에 따라 MongoDB에서는 쿠폰 정보를 Coupons 컬렉션(스토어 관리자 전용)과 CouponIssues 컬렉션(고객이 보유한 쿠폰)으로 분리하여 저장하도록 설계했습니다.
 
 ### 1. 주문서에서 사용할 쿠폰 상태 및 API 초기화
@@ -308,10 +308,10 @@ const { useGetCouponIssues, useUpdateCouponIssues, useGetCouponsPublic } =
 
 //스토어 관리자가 설정중인 쿠폰 사용 가능 여부를 확인하기 위해 가게의 쿠폰 데이터 조회 (type : Coupon)
   const { getSearchingCouponPBData } = useGetCouponsPublic({
-    isUsable: true,
-    isVisible: true,
+    isUsable: true, //사용 가능한 쿠폰만
+    isVisible: true, //스토어 페이지에서 노출중인 쿠폰만
     storePublicId: storePublicId ?? "",
-    today: new Date(),
+    today: new Date(), //주문 당시 일자 기준 사용 가능한 쿠폰만
   });
 
 ```
@@ -344,9 +344,86 @@ useEffect(() => {
 
 ```
 
+``` ts
+const useGetCouponsPublic = (
+    couponSearchKey: Pick<Coupon, "isUsable" | "isVisible"> & {
+      storePublicId: string;
+      today: Date;
+    },
+    callback?: Callback
+  ) => {
+    const { data, isLoading, isError, error, status, refetch } = useFetchQuery(
+      ["SearchingCouponPublic", couponSearchKey.storePublicId],
+      () =>
+        queryFnGet<Coupon[]>(
+          `/coupon/getCoupons?isUsable=${couponSearchKey.isUsable}&isVisible=${couponSearchKey.isVisible}&storePublicId=${couponSearchKey.storePublicId}&today=${couponSearchKey.today}`
+        ),
+      !!couponSearchKey && !!couponSearchKey.storePublicId
+    );
+    useEffect(() => {
+      if (status === "error") {
+        const err = error as Error;
+        setCUSAlertState(
+          err?.message || "쿠폰 정보를 불러오는 중 문제가 발생했습니다."
+        );
+      }
+      if (status === "success") {
+        callback && callback();
+      }
+    }, [status]);
+
+    return {
+      getSearchingCouponPBData: data,
+      isCouponPBLoading: isLoading,
+      getSearChingCouponPBRefetch: refetch,
+      isCouponPBError: isError,
+    };
+  };
+
+  const useGetCouponIssues = (
+    storePublicId: string,
+    customerId: string,
+    isLogin: boolean,
+    callback?: Callback
+  ) => {
+    const isEnabled = !!customerId && isLogin;
+
+    const { data, isLoading, isError, error, status, refetch } = useFetchQuery<
+      CouponIssue[]
+    >(
+      ["CouponIssues"],
+      () =>
+        queryFnGet<CouponIssue[]>(
+          `/coupon/getCouponIssues?storePublicId=${storePublicId}&customerId=${customerId}`,
+          CT.CUSTOMER_ACCESS_TOKEN
+        ),
+      isEnabled
+    );
+    useEffect(() => {
+      if (status === "error") {
+        const err = error as Error;
+        setCUSAlertState(
+          err?.message || "쿠폰 정보를 불러오는 중 문제가 발생했습니다."
+        );
+      }
+      if (status === "success") {
+        callback && callback();
+      }
+    }, [status]);
+
+    return {
+      couponIssueGetData: data,
+      isCouponIssueGetLoading: isLoading,
+      isisCouponIssueGetErrorError: isError,
+      refetchCouponIssueGetError: refetch,
+    };
+  };
+
+```
+
 <br>
 
-### 2. 스토어 관리자가 사용 가능한 상태로으로 설정한 쿠폰 ID 목록 관리
+### 2. 스토어 관리자가 사용 가능한 상태로으로 설정한 쿠폰들의 ID 목록 저장
 
 - 서버에서 받은 스토어 관리자의 쿠폰 관리 데이터(getSearchingCouponPBData)에서 쿠폰 아이디만 추출하여 canUseCouponIds 상태에 저장합니다.
 - canUseCouponIds 상태는 UI에서 canUseCoupon 상태의 쿠폰 아이디와 비교하여, 사용 불가능한 쿠폰의 선택을 비활성화하는 데 활용됩니다.
