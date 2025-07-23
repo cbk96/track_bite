@@ -365,7 +365,7 @@ export const PurchaseSheet: FC<PurchaseSheetProps> = () => {
           ? data.cardNumber
           : "";
 
-      //사용할 쿠폰 선택
+      //선택된 쿠폰 ID를 기준으로 실제 쿠폰 객체 목록 추출
       const selectedCoupon: CouponIssue[] = canUseCoupon
         .filter((coupon) => {
           return selectCoupon.includes(coupon.couponId);
