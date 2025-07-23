@@ -280,6 +280,9 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 
 ### 1. 주문서에서 사용할 쿠폰 상태 및 API 초기화
 
+[src/pages/PurchaseSheet.tsx](src/pages
+/PurchaseSheet.tsx)
+
 ``` ts
 
 import {CouponApi} from "../service";
@@ -325,6 +328,10 @@ const { useGetCouponIssues, useUpdateCouponIssues, useGetCouponsPublic } =
 - 서버에서 받은 고객 보유 쿠폰 데이터(CouponIssueData) 중, 사용 이력이 있는 쿠폰(CouponIssue.coupon.used === true)을 제외하고 사용 가능한 쿠폰만 canUseCoupon 상태에 저장합니다.
 - canUseCoupon 상태는 UI에서 쿠폰을 나열할 때 사용됩니다.
 
+
+[src/pages/PurchaseSheet.tsx](src/pages
+/PurchaseSheet.tsx)
+
 ``` ts
 
 useEffect(() => {
@@ -353,6 +360,9 @@ useEffect(() => {
 - 서버에서 받은 스토어 관리자의 쿠폰 관리 데이터(getSearchingCouponPBData)에서 쿠폰 아이디만 추출하여 canUseCouponIds 상태에 저장합니다.
 - canUseCouponIds 상태는 UI에서 canUseCoupon 상태의 쿠폰 아이디와 비교하여, 사용 불가능한 쿠폰의 선택을 비활성화하는 데 활용됩니다.
 
+[src/pages/PurchaseSheet.tsx](src/pages
+/PurchaseSheet.tsx)
+
 ``` ts
 
   useEffect(() => {
@@ -376,6 +386,10 @@ Array.isArray(getSearchingCouponPBData) &&
 
 - 사용할 쿠폰은 checkbox 타입의 input 요소로 선택되며, ChangeEvent 핸들러인 selectCouponId를 통해 선택 여부를 처리합니다.
 - 쿠폰이 선택되거나 해제될 때, 해당 쿠폰의 할인액을 총 할인 금액에 반영하고, 선택 중인 쿠폰 목록 상태를 업데이트합니다.
+- totalCouponDiscountPrice 상태는 UI에서 총 쿠폰 할인액을 표시할 때 사용됩니다.
+
+[src/pages/PurchaseSheet.tsx](src/pages
+/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -407,6 +421,17 @@ Array.isArray(getSearchingCouponPBData) &&
 
 (중략)
 
+<p className="pt-2 text-right lg:pt-5 ">
+              <span className="mr-5 text-[12px] lg:text-[16px] font-bold">
+                쿠폰 할인액
+              </span>
+              <span className="inline-block min-w-[100px] lg:min-w-[150px] text-[14px] lg:text-[20px] font-bold">
+                {U.accounting(totalCouponDiscountPrice)}원
+              </span>
+            </p>
+
+(중략)
+
  <input
                           type="checkbox"
                           id={coupon.couponId}
@@ -425,10 +450,75 @@ Array.isArray(getSearchingCouponPBData) &&
 
 <br>
 
-### 4. 주문서 데이터에 선택한 쿠폰과 총 쿠폰 할인액 반영
+### 4. 주문서 데이터에 선택한 쿠폰 반영
+
+[src/pages/PurchaseSheet.tsx](src/pages
+/PurchaseSheet.tsx)
 
 ``` ts
+//주문 처리
+  const purchaseConfirm = useCallback(
+    (data: PurchaseInput) => {
 
+(중략)
+
+      //선택된 쿠폰 ID를 기준으로 실제 쿠폰 객체 목록 추출
+      const selectedCoupon: CouponIssue[] = canUseCoupon
+        .filter((coupon) => {
+          return selectCoupon.includes(coupon.couponId);
+        })
+        .map((coupon) => ({ ...coupon, used: true }));
+
+      //입력 정보 정리후 서버 전송
+      if (
+        data !== undefined &&
+        data.tel !== "" &&
+        (storeInfo.paymentMethod[selectTabNum] !== "Credit_card" ||
+          (storeInfo.paymentMethod[selectTabNum] === "Credit_card" &&
+            data.cardNumber))
+      ) {
+        const cofirmPurchase: Purchase[] = pendingPurchase.map((purch) => ({
+          ...purch,
+          name: data.name,
+          totalPrice: totalPrice,
+          paymentMethod: storeInfo.paymentMethod[selectTabNum],
+          cardNumber: inputCardNumber,
+          usedCouponIds: selectCoupon,
+          couponDiscountPrice: totalCouponDiscountPrice,
+          address: {
+            zonecode: data.zonecode,
+            sigunguCode: data.sigunguCode,
+            address: data.address,
+            detailedAddress: data.detailedAddress,
+          },
+          tel: data.tel,
+          deliRequest: data.deliRequest,
+          businessFee: businessFee,
+        }));
+        selectedCoupon.length > 0 &&
+          loginStatus.logined === "login" &&
+          updateCouponIssuesMutate(selectedCoupon);
+        removeCartsMutate({
+          cartIds: selectCartIds,
+          customerId: loginStatus.customerId,
+        });
+        //주문 정보 서버 전송
+        addPurchaseMutate({ purchases: cofirmPurchase });
+      } else {
+        setCUSAlertState("입력되지 않은 값이 있습니다.");
+      }
+    },
+    [
+      register,
+      cartState,
+      appInfo,
+      totalPrice,
+      pendingPurchase,
+      selectCoupon,
+      selectTabNum,
+      totalCouponDiscountPrice,
+    ]
+  );
 ```
 
 
