@@ -314,8 +314,94 @@ const { useGetCouponIssues, useUpdateCouponIssues, useGetCouponsPublic } =
     today: new Date(),
   });
 
+```
+
+<br>
+
+### 2. 고객이 보유한 쿠폰 중 사용하지 않은 쿠폰만 필터링하기
+
+- 서버에서 받은 고객 보유 쿠폰 데이터(CouponIssueData) 중, 사용 이력이 있는 쿠폰(CouponIssue.coupon.used === true)을 제외하고 사용 가능한 쿠폰만 canUseCoupon 상태에 저장합니다.
+- canUseCoupon 상태는 UI에서 쿠폰을 나열할 때 사용됩니다.
+
+``` ts
+
+useEffect(() => {
+    if (
+      CouponIssueData &&
+      Array.isArray(CouponIssueData) &&
+      CouponIssueData.length > 0
+    ) {
+      const usingCoupon = CouponIssueData.filter((coupon: CouponIssue) => {
+        return !coupon.used;
+      }).map((coupon: CouponIssue) => ({
+        ...coupon,
+        purchasePackageId: createPurchasePackId,
+      }));
+
+      setCanUseCoupon(usingCoupon);
+    }
+  }, [CouponIssueData, createPurchasePackId]);
 
 ```
+
+<br>
+
+### 2. 스토어 관리자가 사용 가능한 상태로으로 설정한 쿠폰 ID 목록 관리
+
+- 서버에서 받은 스토어 관리자의 쿠폰 관리 데이터(getSearchingCouponPBData)에서 쿠폰 아이디만 추출하여 canUseCouponIds 상태에 저장합니다.
+- canUseCouponIds 상태는 UI에서 canUseCoupon 상태의 쿠폰 아이디와 비교하여, 사용 불가능한 쿠폰의 선택을 비활성화하는 데 활용됩니다.
+
+``` ts
+
+  useEffect(() => {
+    if (
+      getSearchingCouponPBData &&
+Array.isArray(getSearchingCouponPBData) &&
+      getSearchingCouponPBData.length > 0
+    ) {
+      const canUseCouponIdArr = getSearchingCouponPBData.map((coupon) => {
+        return coupon.couponId;
+      });
+      setCanUseCouponIds(canUseCouponIdArr);
+    }
+  }, [getSearchingCouponPBData]);
+
+```
+
+<br>
+
+### 3. 쿠폰 선택 및 선택된 쿠폰 할인 금액 합산 처리
+
+``` ts
+
+//쿠폰 선택
+  const selectCouponId = useCallback(
+    (e: ChangeEvent<HTMLInputElement>) => {
+      const exisCoupon = [...selectCoupon];
+      let creaseDiscountPrice = totalCouponDiscountPrice;
+      const selectNowCoupon = canUseCoupon.find(
+        (coupon) => coupon.couponId === e.target.value
+      );
+      if (e.target.checked) {
+        const addCoupon = [...exisCoupon, e.target.value];
+        creaseDiscountPrice += Number(selectNowCoupon?.discountPrice);
+
+        setSelectCoupon(addCoupon);
+      } else {
+        const removeCoupon = exisCoupon.filter(
+          (coupon) => coupon !== e.target.value
+        );
+        creaseDiscountPrice -= Number(selectNowCoupon?.discountPrice);
+
+        setSelectCoupon(removeCoupon);
+      }
+      setTotalCouponDiscountPrice(creaseDiscountPrice);
+    },
+    [selectCoupon, canUseCoupon, totalCouponDiscountPrice]
+  );
+
+```
+
 
 <br><br>
 
