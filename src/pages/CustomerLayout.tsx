@@ -15,11 +15,8 @@ export function CustomerLayout() {
   const location = useLocation();
   const noLayoutPages = ["/login", "/signup"];
   const { alertState, setAlertState } = useCustomerPublic();
-  const { keepWork } = AppSettingApi();
-
-  const loginStatus = useSelector<AppState, CS.LoginCustomer>(
-    ({ loginCustomer }) => loginCustomer
-  );
+  const { useKeepWork } = AppSettingApi();
+  const { keepMutate } = useKeepWork();
 
   //페이지 마운트시 최상단으로 이동
   useEffect(() => {
@@ -32,7 +29,7 @@ export function CustomerLayout() {
   //render 서버 다운을 방지하기 위해 12분 주기로 핑 전송
   useEffect(() => {
     const interval = setInterval(() => {
-      keepWork();
+      keepMutate();
     }, 12 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);

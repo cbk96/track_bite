@@ -1,6 +1,7 @@
 import { useState, useCallback } from "react";
 import { get } from "../server";
 import type { AppSettings } from "../type";
+import { useMutation } from "@tanstack/react-query";
 
 type Callback = () => void;
 
@@ -24,9 +25,12 @@ export const AppSettingApi = () => {
       .catch((e: Error) => setErrorMessage(e.message ?? ""));
   }, []);
 
-  const keepWork = () => {
-    get("/appSetting/keep");
+  const useKeepWork = () => {
+    const { mutate } = useMutation({
+      mutationFn: () => get("/appSetting/keep"),
+    });
+    return { keepMutate: mutate };
   };
 
-  return { getAppSetting, keepWork, appInfo };
+  return { getAppSetting, useKeepWork, appInfo };
 };
