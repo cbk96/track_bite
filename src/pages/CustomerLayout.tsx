@@ -33,7 +33,7 @@ export function CustomerLayout() {
   useEffect(() => {
     const interval = setInterval(() => {
       keepWork();
-    }, 2 * 60 * 1000);
+    }, 12 * 60 * 1000);
     return () => clearInterval(interval);
   }, []);
 
