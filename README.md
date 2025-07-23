@@ -276,6 +276,8 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 - 스토어 관리자가 업로드한 쿠폰은 고객이 다운로드한 이후에도 사용 가능 여부를 수정할 수 있어야 한다고 판단했습니다.
 - 이에 따라 MongoDB에서는 쿠폰 정보를 Coupons 컬렉션(스토어 관리자 전용)과 CouponIssues 컬렉션(고객이 보유한 쿠폰)으로 분리하여 저장하도록 설계했습니다.
 
+<br>
+
 ### 1. 주문서에서 사용할 쿠폰 상태 및 API 초기화
 
 ``` ts
@@ -344,83 +346,6 @@ useEffect(() => {
 
 ```
 
-``` ts
-const useGetCouponsPublic = (
-    couponSearchKey: Pick<Coupon, "isUsable" | "isVisible"> & {
-      storePublicId: string;
-      today: Date;
-    },
-    callback?: Callback
-  ) => {
-    const { data, isLoading, isError, error, status, refetch } = useFetchQuery(
-      ["SearchingCouponPublic", couponSearchKey.storePublicId],
-      () =>
-        queryFnGet<Coupon[]>(
-          `/coupon/getCoupons?isUsable=${couponSearchKey.isUsable}&isVisible=${couponSearchKey.isVisible}&storePublicId=${couponSearchKey.storePublicId}&today=${couponSearchKey.today}`
-        ),
-      !!couponSearchKey && !!couponSearchKey.storePublicId
-    );
-    useEffect(() => {
-      if (status === "error") {
-        const err = error as Error;
-        setCUSAlertState(
-          err?.message || "쿠폰 정보를 불러오는 중 문제가 발생했습니다."
-        );
-      }
-      if (status === "success") {
-        callback && callback();
-      }
-    }, [status]);
-
-    return {
-      getSearchingCouponPBData: data,
-      isCouponPBLoading: isLoading,
-      getSearChingCouponPBRefetch: refetch,
-      isCouponPBError: isError,
-    };
-  };
-
-  const useGetCouponIssues = (
-    storePublicId: string,
-    customerId: string,
-    isLogin: boolean,
-    callback?: Callback
-  ) => {
-    const isEnabled = !!customerId && isLogin;
-
-    const { data, isLoading, isError, error, status, refetch } = useFetchQuery<
-      CouponIssue[]
-    >(
-      ["CouponIssues"],
-      () =>
-        queryFnGet<CouponIssue[]>(
-          `/coupon/getCouponIssues?storePublicId=${storePublicId}&customerId=${customerId}`,
-          CT.CUSTOMER_ACCESS_TOKEN
-        ),
-      isEnabled
-    );
-    useEffect(() => {
-      if (status === "error") {
-        const err = error as Error;
-        setCUSAlertState(
-          err?.message || "쿠폰 정보를 불러오는 중 문제가 발생했습니다."
-        );
-      }
-      if (status === "success") {
-        callback && callback();
-      }
-    }, [status]);
-
-    return {
-      couponIssueGetData: data,
-      isCouponIssueGetLoading: isLoading,
-      isisCouponIssueGetErrorError: isError,
-      refetchCouponIssueGetError: refetch,
-    };
-  };
-
-```
-
 <br>
 
 ### 2. 스토어 관리자가 사용 가능한 상태로으로 설정한 쿠폰들의 ID 목록 저장
@@ -449,6 +374,9 @@ Array.isArray(getSearchingCouponPBData) &&
 
 ### 3. 쿠폰 선택 및 선택된 쿠폰 할인 금액 합산 처리
 
+- 사용할 쿠폰은 checkbox 타입의 input 요소로 선택되며, ChangeEvent 핸들러인 selectCouponId를 통해 선택 여부를 처리합니다.
+- 쿠폰이 선택되거나 해제될 때, 해당 쿠폰의 할인액을 총 할인 금액에 반영하고, 선택 중인 쿠폰 목록 상태를 업데이트합니다.
+
 ``` ts
 
 //쿠폰 선택
@@ -476,6 +404,30 @@ Array.isArray(getSearchingCouponPBData) &&
     },
     [selectCoupon, canUseCoupon, totalCouponDiscountPrice]
   );
+
+(중략)
+
+ <input
+                          type="checkbox"
+                          id={coupon.couponId}
+                          value={coupon.couponId}
+                          checked={selectCoupon.includes(coupon.couponId)}
+                          onChange={selectCouponId}
+                          className="hidden peer"
+                          disabled={
+                            !canUseCouponIds.includes(coupon.couponId) ||
+                            coupon.used ||
+                            coupon.minOrderAmount > totalPrice
+                          }
+                        />
+
+```
+
+<br>
+
+### 4. 주문서 데이터에 선택한 쿠폰과 총 쿠폰 할인액 반영
+
+``` ts
 
 ```
 
