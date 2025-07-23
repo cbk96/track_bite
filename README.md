@@ -242,8 +242,8 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 - 로그인한 고객은 스토어에서 노출 중인 쿠폰을 다운로드할 수 있습니다.
 - 고객이 보유한 쿠폰은 ‘사용 가능’과 ‘사용 완료’ 상태로 구분되어 쿠폰 페이지에 표시됩니다.
 
-|                                                  쿠폰 다운로드                                                   |                                                       쿠폰 목록                                                        |
-| :--------------------------------------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------------------------------------------: |
+| 쿠폰 다운로드 | 쿠폰 목록  |
+| :-------: | :-------: |
 | <img src="https://github.com/user-attachments/assets/b1ce268a-5a20-4699-bd36-4a6f46c18d12" alt="쿠폰 다운로드" > | <img src="https://github.com/user-attachments/assets/65e9af2d-dde7-4682-97ac-2a5306ff5145" alt="쿠폰목록" width="300"> |
 
 <br><br>
@@ -280,8 +280,7 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 
 ### 1. 주문서에서 사용할 쿠폰 상태 및 API 초기화
 
-[src/pages/PurchaseSheet.tsx](src/pages
-/PurchaseSheet.tsx)
+[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -329,8 +328,7 @@ const { useGetCouponIssues, useUpdateCouponIssues, useGetCouponsPublic } =
 - canUseCoupon 상태는 UI에서 쿠폰을 나열할 때 사용됩니다.
 
 
-[src/pages/PurchaseSheet.tsx](src/pages
-/PurchaseSheet.tsx)
+[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -360,8 +358,7 @@ useEffect(() => {
 - 서버에서 받은 스토어 관리자의 쿠폰 관리 데이터(getSearchingCouponPBData)에서 쿠폰 아이디만 추출하여 canUseCouponIds 상태에 저장합니다.
 - canUseCouponIds 상태는 UI에서 canUseCoupon 상태의 쿠폰 아이디와 비교하여, 사용 불가능한 쿠폰의 선택을 비활성화하는 데 활용됩니다.
 
-[src/pages/PurchaseSheet.tsx](src/pages
-/PurchaseSheet.tsx)
+[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -388,8 +385,7 @@ Array.isArray(getSearchingCouponPBData) &&
 - 쿠폰이 선택되거나 해제될 때, 해당 쿠폰의 할인액을 총 할인 금액에 반영하고, 선택 중인 쿠폰 목록 상태를 업데이트합니다.
 - totalCouponDiscountPrice 상태는 UI에서 총 쿠폰 할인액을 표시할 때 사용됩니다.
 
-[src/pages/PurchaseSheet.tsx](src/pages
-/PurchaseSheet.tsx)
+[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -452,8 +448,9 @@ Array.isArray(getSearchingCouponPBData) &&
 
 ### 4. 주문서 데이터에 선택한 쿠폰 반영
 
-[src/pages/PurchaseSheet.tsx](src/pages
-/PurchaseSheet.tsx)
+- 주문 정보를 입력값과 함께 정리한 뒤, 선택한 쿠폰 정보를 반영하여 서버로 전송하고, 장바구니 및 쿠폰 사용 상태를 업데이트합니다.
+
+[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 //주문 처리
