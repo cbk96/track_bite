@@ -1,6 +1,5 @@
 import { useState, useCallback } from "react";
 import { get } from "../server";
-import { useDispatch } from "react-redux";
 import type { AppSettings } from "../type";
 
 type Callback = () => void;
@@ -25,5 +24,9 @@ export const AppSettingApi = () => {
       .catch((e: Error) => setErrorMessage(e.message ?? ""));
   }, []);
 
-  return { getAppSetting, appInfo };
+  const keepWork = () => {
+    get("/appSetting/keep");
+  };
+
+  return { getAppSetting, keepWork, appInfo };
 };

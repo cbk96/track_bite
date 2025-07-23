@@ -6,16 +6,16 @@ import { CustomAlert } from "../components/alert";
 import { useCustomerPublic } from "../context";
 import { useEffect } from "react";
 import { useMaintaionCustomerLogin } from "../hook";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import * as CS from "../store/customer";
-import * as U from "../utils";
+import { AppSettingApi } from "../service";
 import { AppState } from "../store";
 
 export function CustomerLayout() {
   const location = useLocation();
-  const dispatch = useDispatch();
   const noLayoutPages = ["/login", "/signup"];
   const { alertState, setAlertState } = useCustomerPublic();
+  const { keepWork } = AppSettingApi();
 
   const loginStatus = useSelector<AppState, CS.LoginCustomer>(
     ({ loginCustomer }) => loginCustomer
@@ -28,6 +28,14 @@ export function CustomerLayout() {
 
   //로그인 유지
   useMaintaionCustomerLogin();
+
+  //render 서버 다운을 방지하기 위해 12분 주기로 핑 전송
+  useEffect(() => {
+    const interval = setInterval(() => {
+      keepWork();
+    }, 2 * 60 * 1000);
+    return () => clearInterval(interval);
+  }, []);
 
   return noLayoutPages.includes(location.pathname) ? (
     <>
