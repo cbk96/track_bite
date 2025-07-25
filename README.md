@@ -277,7 +277,6 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 - 판매 중인 메뉴는 메뉴 관리자 페이지에서 @hello-pangea/dnd 패키지를 활용한 드래그 앤 드롭 방식으로 순서를 조정할 수 있습니다.
 - 변경된 순서는 UI에 즉시 반영되도록 Redux에 임시 저장되며, 사용자가 페이지를 이탈하려 할 때 useBlocker를 통해 이를 감지하여 서버로 최종 순서를 전송하고 영구 저장합니다.
 
-  <br>
 
 ### 1. 드래그로 변경된 순서를 Redux로 임시 저장
 
@@ -287,24 +286,25 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 
 [메뉴 관리 페이지 컴포넌트](src/pages/MenuManage.tsx)
 
-``` ts
+``` tsx
 
-//메뉴 드래그 종료 시 순서 변경 결과를 반영하는 드래그엔드 함수
+// 메뉴 드래그 종료 시 순서 변경 결과를 반영하는 드래그엔드 함수
 const { onDragEndMenu } = useMenuList();
 
 (중략)
 
-//메뉴 드래그 영역
+// 메뉴 드래그 영역
 <DragDropContext onDragEnd={onDragEndMenu}>
-                      <CardDroppable
-                        droppableId="menuDropZone"
-                        direction="vertical"
-                        className="max-w-[820px]"
-                      >
-//메뉴 리스트 (드래그어블 요소)
-                        {menusContainer}
-                      </CardDroppable>
-                    </DragDropContext>
+  <CardDroppable 
+    droppableId="menuDropZone"
+    direction="vertical"
+    className="max-w-[820px]"
+  >
+    {/* 메뉴 리스트 (드래그어블 요소) */}
+    {menusContainer}
+  </CardDroppable>
+</DragDropContext>
+
 ```
 
 <br>
@@ -414,10 +414,6 @@ export const swapItemsInArray = <T>(
 ```
 
 <br>
-
-``` ts
-
-```
 
 
 <br><br>
