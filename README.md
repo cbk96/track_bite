@@ -311,7 +311,7 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 스와핑 함수를 통해 두 요소의 순서를 교환한 뒤 Redux 상태로 저장합니다.
 - 이후, 변경된 순서 상태를 감지하여 UI에 즉시 반영합니다.
 
-[메뉴 관리 페이지 컴포넌트](src/pages/MenuManage.tsx)
+[메뉴 관리 페이지 컴포넌트](src/pages/Admin/MenuManage.tsx)
 
 ``` tsx
 
