@@ -516,7 +516,7 @@ const { useGetCouponIssues, useUpdateCouponIssues, useGetCouponsPublic } =
 - canUseCoupon 상태는 UI에서 쿠폰을 나열할 때 사용됩니다.
 
 
-[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx#L259)
 
 ``` ts
 
@@ -546,7 +546,7 @@ useEffect(() => {
 - 서버에서 받은 스토어 관리자의 쿠폰 관리 데이터(getSearchingCouponPBData)에서 쿠폰 아이디만 추출하여 canUseCouponIds 상태에 저장합니다.
 - canUseCouponIds 상태는 UI에서 canUseCoupon 상태의 쿠폰 아이디와 비교하여, 사용 불가능한 쿠폰의 선택을 비활성화하는 데 활용됩니다.
 
-[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx#L311)
 
 ``` ts
 
@@ -573,9 +573,9 @@ Array.isArray(getSearchingCouponPBData) &&
 - 쿠폰이 선택되거나 해제될 때, 해당 쿠폰의 할인액을 총 할인 금액에 반영하고, 선택 중인 쿠폰 목록 상태를 업데이트합니다.
 - totalCouponDiscountPrice 상태는 UI에서 총 쿠폰 할인액을 표시할 때 사용됩니다.
 
-[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx#L325)
 
-``` ts
+``` tsx
 
 //쿠폰 선택
   const selectCouponId = useCallback(
@@ -603,7 +603,13 @@ Array.isArray(getSearchingCouponPBData) &&
     [selectCoupon, canUseCoupon, totalCouponDiscountPrice]
   );
 
-(중략)
+```
+
+<br>
+
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx#L3460)
+
+``` tsx
 
 <p className="pt-2 text-right lg:pt-5 ">
               <span className="mr-5 text-[12px] lg:text-[16px] font-bold">
@@ -614,21 +620,22 @@ Array.isArray(getSearchingCouponPBData) &&
               </span>
             </p>
 
-(중략)
+```
+
+<br>
+
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx#L614)
+
+```tsx
 
  <input
-                          type="checkbox"
-                          id={coupon.couponId}
-                          value={coupon.couponId}
-                          checked={selectCoupon.includes(coupon.couponId)}
-                          onChange={selectCouponId}
-                          className="hidden peer"
-                          disabled={
-                            !canUseCouponIds.includes(coupon.couponId) ||
-                            coupon.used ||
-                            coupon.minOrderAmount > totalPrice
-                          }
-                        />
+type="checkbox"
+id={coupon.couponId}
+value={coupon.couponId}
+checked{selectCoupon.includes(coupon.couponId)}
+onChange={selectCouponId}
+className="hidden peer"
+disabled={!canUseCouponIds.includes(coupon.couponId) || coupon.used ||coupon.minOrderAmount > totalPrice}/>
 
 ```
 
@@ -638,7 +645,7 @@ Array.isArray(getSearchingCouponPBData) &&
 
 - 주문 정보를 입력값과 함께 정리한 뒤, 선택한 쿠폰 정보를 반영하여 서버로 전송하고, 장바구니 및 쿠폰 사용 상태를 업데이트합니다.
 
-[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx#L351)
 
 ``` ts
 //주문 처리
