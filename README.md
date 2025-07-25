@@ -285,7 +285,32 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 스와핑 함수를 통해 두 요소의 순서를 맞바꾼 뒤 Redux 상태로 저장합니다.
 - 이후, 변경된 순서 상태를 감지하여 UI에 즉시 반영합니다.
 
+[메뉴 관리 페이지 컴포넌트](src/pages/MenuManage.tsx)
+
+``` ts
+
+//메뉴 드래그 종료 시 순서 변경 결과를 반영하는 드래그엔드 함수
+const { onDragEndMenu } = useMenuList();
+
+(중략)
+
+//메뉴 드래그 영역
+<DragDropContext onDragEnd={onDragEndMenu}>
+                      <CardDroppable
+                        droppableId="menuDropZone"
+                        direction="vertical"
+                        className="max-w-[820px]"
+                      >
+//메뉴 리스트 (드래그어블 요소)
+                        {menusContainer}
+                      </CardDroppable>
+                    </DragDropContext>
+```
+
+<br>
+
 [드래그엔드 함수]()
+
   ``` ts
 
 //메뉴 목록 Redux 상태 호출
@@ -296,10 +321,55 @@ const menuState = useSelector<AdminState, Menu[]>(({ menu }) => menu);
   const onDragEndMenu = useSortableList(menuState, M.setMenu);
 
 ```
+
+[변경된 순서를 Redux 상태로 저장하는 함수](src/hook/sortableList.ts)
+
+<br>
+
+``` ts
+export const useSortableList = <T extends ItemWithOrder>(
+  list: T[],
+  setListAction: (updateList: T[]) => any
+) => {
+  const dispatch = useDispatch();
+
+  const onDragEndGroup = useCallback(
+    (result: BeautifulResult) => {
+      const destinationCardId = result.destination?.droppableId; //드래그 종료 지점의 droppableId ("mainDropZone")
+      const destinationCardIndex = result.destination?.index; //드래그 종료 지점의 순번
+      // console.log("드래그 종료 지점 ID : ", destinationCardId);
+      // console.log("드래그 종료 위치 : ", destinationCardIndex);
+
+      if (
+        destinationCardId === undefined ||
+        destinationCardIndex === undefined
+      ) {
+        return;
+      }
+
+      const sourceCardId = result.source.droppableId; //드래그 시작 지점의 droppableId ("mainDropZone")
+      const sourceCardIndex = result.source.index;
+      let dragIndex = list.findIndex((item) => item.order === sourceCardIndex);
+      let dropIndex = list.findIndex(
+        (item) => item.order === destinationCardIndex
+      );
+
+      const swapList = U.swapItemsInArray(list, dragIndex, dropIndex);
+      const resultList = swapList.map((item, index) => {
+        return { ...item, order: index };
+      });
+      dispatch(setListAction(resultList));
+    },
+    [list, dispatch]
+  );
+  return onDragEndGroup;
+};
+
+```
+
 <br>
 
 [스와이핑 함수]()
-
 
 ``` ts
 //특정 두 index의 item의 순서를 바꾼 배열 반환
@@ -341,26 +411,7 @@ export const swapItemsInArray = <T>(
 
 ```
 
-
-[src/pages/MenuManage.tsx](src/pages/MenuManage.tsx)
-
-``` ts
-(중략)
-
-<DragDropContext onDragEnd={onDragEndMenu}>
-                      <CardDroppable
-                        droppableId="menuDropZone"
-                        direction="vertical"
-                        className="max-w-[820px]"
-                      >
-//메뉴 리스트 (드래그어블 요소)
-                        {menusContainer}
-                      </CardDroppable>
-                    </DragDropContext>
-```
-
 <br>
-
 
 ``` ts
 
