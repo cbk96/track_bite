@@ -281,14 +281,14 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 ### 1. 드래그로 변경된 순서를 Redux로 임시 저장
 
 - 드래그로 이동한 요소의 **원래 위치(index)**와 **드롭된 위치(index)**를 비교하여,
-스와핑 함수를 통해 두 요소의 순서를 맞바꾼 뒤 Redux 상태로 저장합니다.
+스와핑 함수를 통해 두 요소의 순서를 교환한 뒤 Redux 상태로 저장합니다.
 - 이후, 변경된 순서 상태를 감지하여 UI에 즉시 반영합니다.
 
 [메뉴 관리 페이지 컴포넌트](src/pages/MenuManage.tsx)
 
 ``` tsx
 
-// 메뉴 드래그 종료 시 순서 변경 결과를 반영하는 드래그엔드 함수
+// 메뉴 드래그 종료 시 순서 변경 결과를 반영하는 온드래그엔드 함수
 const { onDragEndMenu } = useMenuList();
 
 (중략)
@@ -309,15 +309,15 @@ const { onDragEndMenu } = useMenuList();
 
 <br>
 
-[드래그엔드 함수 (onDragEndMenu)]()
+[온드래그엔드 함수 (onDragEndMenu)]()
 
   ``` ts
 
-//메뉴 목록 Redux 상태 호출
+// 현재 Redux에 저장된 메뉴 목록 상태를 호출
 const menuState = useSelector<AdminState, Menu[]>(({ menu }) => menu);
 
-//메뉴 순서 드래그엔드 함수
-// M.setMenu : dispatch에 전달할 action 객체
+//메뉴 순서를 업데이트하기 위한 onDragEnd 핸들러 함수
+// M.setMenu는 Redux 상태를 변경하기 위한 액션 생성자
   const onDragEndMenu = useSortableList(menuState, M.setMenu);
 
 ```
@@ -352,14 +352,14 @@ export const useSortableList = <T extends ItemWithOrder>(
         (item) => item.order === destinationCardIndex
       );
 
-//드래그 시작 위치와 종료 위치를 맞바꾼 메뉴 배열 생성
+//드래그한 위치와 드롭한 위치를 교환한 메뉴 배열 생성
       const swapList = U.swapItemsInArray(list, dragIndex, dropIndex);
 
       const resultList = swapList.map((item, index) => {
         return { ...item, order: index };
       });
 
-//순서가 변경된 메뉴 배열을 Redux 상태로 저장
+//변경된 순서를 Redux 상태에 반영
 dispatch(setListAction(resultList));
     },
     [list, dispatch]
@@ -374,7 +374,7 @@ dispatch(setListAction(resultList));
 [스와이핑 함수 (swapItemsInArray)]()
 
 ``` ts
-//특정 두 index의 item의 순서를 바꾼 배열 반환
+//주어진 두 index의 항목을 맞바꾼 새 배열을 반환
 export const swapItemsInArray = <T>(
   array: T[],
   index1: number,
@@ -382,7 +382,6 @@ export const swapItemsInArray = <T>(
 ) => {
   if (index1 > index2) {
     //뒤에서 앞으로 가져오는 경우
-    console.log("뒤에서 앞으로 가져오는 경우");
     const swapArray = array.map((item, index) =>
       index < index1 && index > index2
         ? array[index - 1]
@@ -395,7 +394,6 @@ export const swapItemsInArray = <T>(
     return swapArray;
   } else if (index1 < index2) {
     //앞에서 뒤로 가져오는 경우
-    console.log("앞에서 뒤로 가져오는 경우");
     const swapArray = array.map((item, index) =>
       index < index2 && index > index1
         ? array[index + 1]
