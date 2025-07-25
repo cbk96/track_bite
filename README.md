@@ -309,7 +309,7 @@ const { onDragEndMenu } = useMenuList();
 
 <br>
 
-[드래그엔드 함수]()
+[드래그엔드 함수 (onDragEndMenu)]()
 
   ``` ts
 
@@ -322,9 +322,9 @@ const menuState = useSelector<AdminState, Menu[]>(({ menu }) => menu);
 
 ```
 
-[변경된 순서를 Redux 상태로 저장하는 함수](src/hook/sortableList.ts)
-
 <br>
+
+[Redux 상태 저장 훅 (useSortableList)](src/hook/sortableList.ts)
 
 ``` ts
 export const useSortableList = <T extends ItemWithOrder>(
@@ -337,8 +337,6 @@ export const useSortableList = <T extends ItemWithOrder>(
     (result: BeautifulResult) => {
       const destinationCardId = result.destination?.droppableId; //드래그 종료 지점의 droppableId ("mainDropZone")
       const destinationCardIndex = result.destination?.index; //드래그 종료 지점의 순번
-      // console.log("드래그 종료 지점 ID : ", destinationCardId);
-      // console.log("드래그 종료 위치 : ", destinationCardIndex);
 
       if (
         destinationCardId === undefined ||
@@ -354,11 +352,15 @@ export const useSortableList = <T extends ItemWithOrder>(
         (item) => item.order === destinationCardIndex
       );
 
+//드래그 시작 위치와 종료 위치를 맞바꾼 메뉴 배열 생성
       const swapList = U.swapItemsInArray(list, dragIndex, dropIndex);
+
       const resultList = swapList.map((item, index) => {
         return { ...item, order: index };
       });
-      dispatch(setListAction(resultList));
+
+//순서가 변경된 메뉴 배열을 Redux 상태로 저장
+dispatch(setListAction(resultList));
     },
     [list, dispatch]
   );
@@ -369,7 +371,7 @@ export const useSortableList = <T extends ItemWithOrder>(
 
 <br>
 
-[스와이핑 함수]()
+[스와이핑 함수 (swapItemsInArray)]()
 
 ``` ts
 //특정 두 index의 item의 순서를 바꾼 배열 반환
