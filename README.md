@@ -309,7 +309,7 @@ const { onDragEndMenu } = useMenuList();
 
 <br>
 
-[온드래그엔드 함수 (onDragEndMenu)]()
+[온드래그엔드 함수 (onDragEndMenu)](src/store/useMenuList.ts#L22)
 
   ``` ts
 
@@ -324,7 +324,7 @@ const menuState = useSelector<AdminState, Menu[]>(({ menu }) => menu);
 
 <br>
 
-[Redux 상태 저장 훅 (useSortableList)](src/hook/sortableList.ts)
+[순서 변경 처리 훅](src/hook/sortableList.ts)
 
 ``` ts
 export const useSortableList = <T extends ItemWithOrder>(
@@ -371,7 +371,7 @@ dispatch(setListAction(resultList));
 
 <br>
 
-[스와이핑 함수 (swapItemsInArray)]()
+[스와이핑 함수 (swapItemsInArray)](src/utils/arrayUtil.ts)
 
 ``` ts
 //주어진 두 index의 항목을 맞바꾼 새 배열을 반환
@@ -413,6 +413,22 @@ export const swapItemsInArray = <T>(
 
 <br>
 
+### 2. 페이지 이탈시 서버에 변경된 메뉴 순서 전송
+
+- 페이지 이탈 시 useBlocker를 활용해 이탈 여부를 감지하고, 변경된 메뉴 순서를 서버에 전송하여 영구적으로 저장합니다.
+- 이를 통해 드래그 앤 드롭 기반 순서 변경 중 불필요한 서버 호출을 방지하고, 최종 변경 시점에만 서버와 통신하도록 최적화하였습니다.
+
+[메뉴 관리 페이지](src/pages/Admin/MenuManage.tsx#L64)
+
+``` ts
+useBlocker(({ currentLocation, nextLocation }) => {
+    if (currentLocation.pathname !== nextLocation.pathname) {
+      menuGroupsState.length > 0 && updateMenuGroupMutate(menuGroupsState);
+      menuState.length > 0 && updateMenuMutate(menuState);
+    }
+    return false;
+  });
+```
 
 <br><br>
 
