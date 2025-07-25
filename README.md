@@ -271,6 +271,104 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 
 <br><br>
 
+
+## 📋 메뉴 정렬은 이렇게 처리됩니다.
+
+- 판매 중인 메뉴는 메뉴 관리자 페이지에서 @hello-pangea/dnd 패키지를 활용한 드래그 앤 드롭 방식으로 순서를 조정할 수 있습니다.
+- 변경된 순서는 UI에 즉시 반영되도록 Redux에 임시 저장되며, 사용자가 페이지를 이탈하려 할 때 useBlocker를 통해 이를 감지하여 서버로 최종 순서를 전송하고 영구 저장합니다.
+
+  <br>
+
+### 1. 드래그로 변경된 순서를 Redux로 임시 저장
+
+- 드래그로 이동한 요소의 **원래 위치(index)**와 **드롭된 위치(index)**를 비교하여,
+스와핑 함수를 통해 두 요소의 순서를 맞바꾼 뒤 Redux 상태로 저장합니다.
+- 이후, 변경된 순서 상태를 감지하여 UI에 즉시 반영합니다.
+
+[드래그엔드 함수]()
+  ``` ts
+
+//메뉴 목록 Redux 상태 호출
+const menuState = useSelector<AdminState, Menu[]>(({ menu }) => menu);
+
+//메뉴 순서 드래그엔드 함수
+// M.setMenu : dispatch에 전달할 action 객체
+  const onDragEndMenu = useSortableList(menuState, M.setMenu);
+
+```
+<br>
+
+[스와이핑 함수]()
+
+
+``` ts
+//특정 두 index의 item의 순서를 바꾼 배열 반환
+export const swapItemsInArray = <T>(
+  array: T[],
+  index1: number,
+  index2: number
+) => {
+  if (index1 > index2) {
+    //뒤에서 앞으로 가져오는 경우
+    console.log("뒤에서 앞으로 가져오는 경우");
+    const swapArray = array.map((item, index) =>
+      index < index1 && index > index2
+        ? array[index - 1]
+        : index === index2
+        ? array[index1]
+        : index === index1
+        ? array[index - 1]
+        : array[index]
+    );
+    return swapArray;
+  } else if (index1 < index2) {
+    //앞에서 뒤로 가져오는 경우
+    console.log("앞에서 뒤로 가져오는 경우");
+    const swapArray = array.map((item, index) =>
+      index < index2 && index > index1
+        ? array[index + 1]
+        : index === index2
+        ? array[index1]
+        : index === index1
+        ? array[index + 1]
+        : array[index]
+    );
+    return swapArray;
+  } else {
+    return array;
+  }
+};
+
+```
+
+
+[src/pages/MenuManage.tsx](src/pages/MenuManage.tsx)
+
+``` ts
+(중략)
+
+<DragDropContext onDragEnd={onDragEndMenu}>
+                      <CardDroppable
+                        droppableId="menuDropZone"
+                        direction="vertical"
+                        className="max-w-[820px]"
+                      >
+//메뉴 리스트 (드래그어블 요소)
+                        {menusContainer}
+                      </CardDroppable>
+                    </DragDropContext>
+```
+
+<br>
+
+
+``` ts
+
+```
+
+
+<br><br>
+
 ## 🏷️ 주문서 작성시 쿠폰은 이렇게 사용됩니다.
 
 - 스토어 관리자가 업로드한 쿠폰은 고객이 다운로드한 이후에도 사용 가능 여부를 수정할 수 있어야 한다고 판단했습니다.
