@@ -311,7 +311,7 @@ JWT와 쿠키를 결합해 인증 및 로그인 상태를 관리합니다.
 스와핑 함수를 통해 두 요소의 순서를 교환한 뒤 Redux 상태로 저장합니다.
 - 이후, 변경된 순서 상태를 감지하여 UI에 즉시 반영합니다.
 
-[메뉴 관리 페이지 컴포넌트](src/pages/Admin/MenuManage.tsx)
+[메뉴 관리 페이지 컴포넌트](src/pages/Admin/MenuManage.tsx#L240)
 
 ``` tsx
 
@@ -468,7 +468,7 @@ useBlocker(({ currentLocation, nextLocation }) => {
 
 #### 1. 주문서에서 사용할 쿠폰 상태 및 API 초기화
 
-[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -516,7 +516,7 @@ const { useGetCouponIssues, useUpdateCouponIssues, useGetCouponsPublic } =
 - canUseCoupon 상태는 UI에서 쿠폰을 나열할 때 사용됩니다.
 
 
-[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -546,7 +546,7 @@ useEffect(() => {
 - 서버에서 받은 스토어 관리자의 쿠폰 관리 데이터(getSearchingCouponPBData)에서 쿠폰 아이디만 추출하여 canUseCouponIds 상태에 저장합니다.
 - canUseCouponIds 상태는 UI에서 canUseCoupon 상태의 쿠폰 아이디와 비교하여, 사용 불가능한 쿠폰의 선택을 비활성화하는 데 활용됩니다.
 
-[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -573,7 +573,7 @@ Array.isArray(getSearchingCouponPBData) &&
 - 쿠폰이 선택되거나 해제될 때, 해당 쿠폰의 할인액을 총 할인 금액에 반영하고, 선택 중인 쿠폰 목록 상태를 업데이트합니다.
 - totalCouponDiscountPrice 상태는 UI에서 총 쿠폰 할인액을 표시할 때 사용됩니다.
 
-[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 
@@ -638,7 +638,7 @@ Array.isArray(getSearchingCouponPBData) &&
 
 - 주문 정보를 입력값과 함께 정리한 뒤, 선택한 쿠폰 정보를 반영하여 서버로 전송하고, 장바구니 및 쿠폰 사용 상태를 업데이트합니다.
 
-[src/pages/PurchaseSheet.tsx](src/pages/PurchaseSheet.tsx)
+[주문서 페이지 컴포넌트](src/pages/PurchaseSheet.tsx)
 
 ``` ts
 //주문 처리
